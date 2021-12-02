@@ -1,0 +1,20 @@
+server:
+  port: 4040
+
+#mysqldatabase config
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    #change connection ip port before run
+    url: jdbc:mysql://localhost:3306/scdb?useUnicode=true&createDatabaseIfNotExist=true
+    username: root
+    password: Adm1nI@#
+  jpa:
+    hibernate.ddl-auto: update
+    generate-ddl: true
+    show-sql: true
+
+  jackson:
+    date-format: 'yyyy-MM-dd HH:mm:ss'
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
