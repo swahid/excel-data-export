@@ -31,70 +31,75 @@ public class ExcelHelper {
     public static List<NorthEnd> excelToTutorials(InputStream is, String fileName) {
         try {
             Workbook workbook = new XSSFWorkbook(is);
-
-            Sheet sheet = workbook.getSheetAt(0);
-            System.out.println("sheetName: " + sheet.getSheetName());
-            Iterator<Row> rows = sheet.iterator();
-
             List<NorthEnd> tutorials = new ArrayList<>();
 
-            int rowNumber = 0;
-            while (rows.hasNext()) {
-                Row currentRow = rows.next();
-                //System.out.println("ROW: " + currentRow.getCell(0));
-                // skip header
-                if (rowNumber <3) {
-                    rowNumber++;
-                    continue;
-                }
+            for (int i = 0; i < 7; i++) {
+                // Do your stuff
+                Sheet sheet = workbook.getSheetAt(i);
+                System.out.println("sheetName: " + sheet.getSheetName());
+                Iterator<Row> rows = sheet.iterator();
 
-                Iterator<Cell> cellsInRow = currentRow.iterator();
 
-                NorthEnd tutorial = new NorthEnd();
-
-                int cellIdx = 0;
-                if (Objects.nonNull(currentRow.getCell(0))){
-                    while (cellsInRow.hasNext()) {
-                        Cell currentCell = cellsInRow.next();
-
-                        switch (cellIdx) {
-                            case 0:
-                                System.out.println("Items: " + currentCell.getStringCellValue());
-                                tutorial.setItems(currentCell.getStringCellValue());
-                                break;
-
-                            case 1:
-                                tutorial.setUnitName(currentCell.getStringCellValue());
-                                System.out.println(currentCell.getStringCellValue());
-                                break;
-
-                            case 2:
-                                System.out.println(currentCell.getNumericCellValue());
-                                tutorial.setOrderValue((int) currentCell.getNumericCellValue());
-                                break;
-
-                            case 4:
-                                System.out.println(currentCell.getNumericCellValue());
-                                tutorial.setDeliverValue((int) currentCell.getNumericCellValue());
-                                break;
-
-                            default:
-                                break;
-                        }
-
-                        cellIdx++;
+                int rowNumber = 0;
+                while (rows.hasNext()) {
+                    Row currentRow = rows.next();
+                    //System.out.println("ROW: " + currentRow.getCell(0));
+                    // skip header
+                    if (rowNumber <3) {
+                        rowNumber++;
+                        continue;
                     }
 
-                    tutorial.setDailyDate(ExcelHelper.convertDate(fileName));
-                    tutorial.setFileName(fileName);
-                    tutorial.setSheetName(sheet.getSheetName());
-                    tutorials.add(tutorial);
-                }
+                    Iterator<Cell> cellsInRow = currentRow.iterator();
 
+                    NorthEnd tutorial = new NorthEnd();
+
+                    int cellIdx = 0;
+                    if (Objects.nonNull(currentRow.getCell(0))){
+                        while (cellsInRow.hasNext()) {
+                            Cell currentCell = cellsInRow.next();
+
+                            switch (cellIdx) {
+                                case 0:
+                                    System.out.println("Items: " + currentCell.getStringCellValue());
+                                    tutorial.setItems(currentCell.getStringCellValue());
+                                    break;
+
+                                case 1:
+                                    tutorial.setUnitName(currentCell.getStringCellValue());
+                                    System.out.println(currentCell.getStringCellValue());
+                                    break;
+
+                                case 2:
+                                    System.out.println(currentCell.getNumericCellValue());
+                                    tutorial.setOrderValue((int) currentCell.getNumericCellValue());
+                                    break;
+
+                                case 4:
+                                    System.out.println(currentCell.getNumericCellValue());
+                                    tutorial.setDeliverValue((int) currentCell.getNumericCellValue());
+                                    break;
+
+                                default:
+                                    break;
+                            }
+
+                            cellIdx++;
+                        }
+
+                        tutorial.setDailyDate(ExcelHelper.convertDate(fileName));
+                        tutorial.setFileName(fileName);
+                        tutorial.setSheetName(sheet.getSheetName());
+                        tutorials.add(tutorial);
+                    }
+
+                }
+                System.out.println("Sheet: " + sheet.getSheetName());
+                System.out.println("totalData: " + tutorials.size());
             }
+
             workbook.close();
 
-            System.out.println("totalData: " + tutorials.size());
             return tutorials;
         } catch (IOException | ParseException e) {
             throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
