@@ -3,3 +3,7 @@ spring:
     name: northend-excel
   profiles:
     active: local
+  servlet:
+  multipart:
+  max-file-size: 5MB
+  max-request-size: 5MB
