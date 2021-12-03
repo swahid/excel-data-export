@@ -6,6 +6,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -32,8 +34,10 @@ public class ExcelHelper {
         try {
             Workbook workbook = new XSSFWorkbook(is);
             List<NorthEnd> tutorials = new ArrayList<>();
+            fileName = fileName.substring(0, fileName.lastIndexOf("."));
 
-            for (int i = 0; i < 7; i++) {
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                if( i >6) break;
                 // Do your stuff
                 Sheet sheet = workbook.getSheetAt(i);
                 System.out.println("sheetName: " + sheet.getSheetName());
@@ -55,7 +59,7 @@ public class ExcelHelper {
                     NorthEnd tutorial = new NorthEnd();
 
                     int cellIdx = 0;
-                    if (Objects.nonNull(currentRow.getCell(0))){
+                    if (!ObjectUtils.isEmpty(currentRow.getCell(0))){
                         while (cellsInRow.hasNext()) {
                             Cell currentCell = cellsInRow.next();
 
@@ -72,12 +76,12 @@ public class ExcelHelper {
 
                                 case 2:
                                     System.out.println(currentCell.getNumericCellValue());
-                                    tutorial.setOrderValue((int) currentCell.getNumericCellValue());
+                                    tutorial.setOrder1((int) currentCell.getNumericCellValue());
                                     break;
 
                                 case 4:
                                     System.out.println(currentCell.getNumericCellValue());
-                                    tutorial.setDeliverValue((int) currentCell.getNumericCellValue());
+                                    tutorial.setDelivery1((int) currentCell.getNumericCellValue());
                                     break;
 
                                 default:

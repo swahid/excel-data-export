@@ -1,5 +1,6 @@
 package io.github.swahid.northend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,8 @@ import java.util.Date;
 @Table(name = "northend")
 public class NorthEnd implements Serializable {
 
+
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
@@ -24,11 +27,11 @@ public class NorthEnd implements Serializable {
     @Column(name = "sheet_name")
     private String sheetName;
 
-    @Column(name = "order_value")
-    private Integer orderValue;
+    @Column(name = "order1")
+    private Integer order1;
 
-    @Column(name = "deliver_value")
-    private Integer deliverValue;
+    @Column(name = "delivery1")
+    private Integer delivery1;
 
     @Column(name = "unit_name")
     private String unitName;

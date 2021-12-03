@@ -3,6 +3,7 @@ package io.github.swahid.northend.service;
 import io.github.swahid.northend.entity.NorthEnd;
 import io.github.swahid.northend.repository.NorthEndRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,6 @@ public class NorthendService {
 
     @Transactional(readOnly = true)
     public List<NorthEnd> findAll(){
-        return northEndRepo.findAll();
+        return northEndRepo.findAll(Sort.by(Sort.Direction.ASC,  "dailyDate", "id"));
     }
 }
