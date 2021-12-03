@@ -30,6 +30,6 @@ public class NorthendService {
 
     @Transactional(readOnly = true)
     public List<NorthEnd> findAll(){
-        return northEndRepo.findAll(Sort.by(Sort.Direction.ASC,  "dailyDate", "id"));
+        return northEndRepo.findAllByItemsNot("",Sort.by(Sort.Direction.ASC,  "dailyDate", "id"));
     }
 }

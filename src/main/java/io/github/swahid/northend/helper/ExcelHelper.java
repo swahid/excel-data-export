@@ -59,7 +59,7 @@ public class ExcelHelper {
                     NorthEnd tutorial = new NorthEnd();
 
                     int cellIdx = 0;
-                    if (!ObjectUtils.isEmpty(currentRow.getCell(0))){
+                    if (Objects.nonNull(currentRow.getCell(0))){
                         while (cellsInRow.hasNext()) {
                             Cell currentCell = cellsInRow.next();
 
