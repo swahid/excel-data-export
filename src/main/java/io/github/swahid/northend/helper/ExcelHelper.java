@@ -88,7 +88,7 @@ public class ExcelHelper {
                         }
 
                         tutorial.setDailyDate(ExcelHelper.convertDate(fileName));
-                        tutorial.setFileName(new SimpleDateFormat("yyyy-MM-dd EEE").format(tutorial.getDailyDate()));
+                        tutorial.setFileName(new SimpleDateFormat("yyyy-MM-dd EEEE").format(tutorial.getDailyDate()));
                         tutorial.setSheetName(sheet.getSheetName());
                         tutorials.add(tutorial);
                     }
