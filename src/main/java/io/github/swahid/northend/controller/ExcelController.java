@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
 
 @CrossOrigin
@@ -42,15 +43,29 @@ public class ExcelController {
     }
 
     @GetMapping("/data")
-    public ResponseEntity<?> getAllTutorials() {
+    public ResponseEntity<?> getData(@RequestParam(value = "startDate", required = false)Date startDate,
+                                             @RequestParam(value = "endDate", required = false)Date endDate
+                                             ) {
         try {
-            List<NorthEnd> tutorials = northEndService.findAll();
+            List<NorthEnd> tutorials = northEndService.findAll(startDate, endDate);
 
             if (tutorials.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
 
             return new ResponseEntity<>(tutorials, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/delete")
+    public ResponseEntity<?> deleteDate(@RequestParam(value = "fileName", required = false)String fileName){
+        try {
+             northEndService.deleteByFileName(fileName);
+
+            return new ResponseEntity<>("{'delete success'}", HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

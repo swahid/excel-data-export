@@ -7,7 +7,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class NorthendService {
@@ -29,7 +31,28 @@ public class NorthendService {
     }
 
     @Transactional(readOnly = true)
-    public List<NorthEnd> findAll(){
-        return northEndRepo.findAllByItemsNot("",Sort.by(Sort.Direction.ASC,  "dailyDate", "id"));
+    public List<NorthEnd> findAll(Date startDate, Date endDate) throws Exception{
+
+        if (Objects.nonNull(startDate) && Objects.nonNull(endDate)){
+            return northEndRepo.findAllByItemsNotAndDailyDateBetween("", startDate, endDate, getSorting());
+        }
+        return northEndRepo.findAllByItemsNot("",getSorting());
     }
+
+    private Sort getSorting(){
+        return Sort.by(Sort.Direction.ASC,  "dailyDate", "id");
+    }
+
+    @Transactional
+    public void deleteByFileName(String fileName) throws Exception{
+        if (Objects.nonNull(fileName)){
+            List<NorthEnd> northEndList = northEndRepo.findAllByFileName(fileName);
+            northEndRepo.deleteAll(northEndList);
+
+        }else{
+            northEndRepo.deleteAll();
+        }
+    }
+
+
 }
