@@ -3,7 +3,6 @@ package io.github.swahid.northend.helper;
 import io.github.swahid.northend.entity.NorthEnd;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -34,12 +33,12 @@ public class ExcelHelper {
             DataFormatter formatter = new DataFormatter();
 
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-                if( i >6) break;
                 // Do your stuff
                 Sheet sheet = workbook.getSheetAt(i);
                 System.out.println("sheetName: " + sheet.getSheetName());
                 Iterator<Row> rows = sheet.iterator();
 
+                if( i >6 || sheet.getSheetName().equalsIgnoreCase("Unit Guide")) break;
 
                 int rowNumber = 0;
                 while (rows.hasNext()) {
@@ -62,22 +61,22 @@ public class ExcelHelper {
 
                             switch (cellIdx) {
                                 case 0:
-                                    System.out.println("Items: " + currentCell.getStringCellValue());
-                                    tutorial.setItems(currentCell.getStringCellValue());
+//                                    System.out.println("Items: " + formatter.formatCellValue(currentCell));
+                                    tutorial.setItems(formatter.formatCellValue(currentCell));
                                     break;
 
                                 case 1:
-                                    tutorial.setUnitName(currentCell.getStringCellValue());
-                                    System.out.println(currentCell.getStringCellValue());
+//                                    System.out.println(formatter.formatCellValue(currentCell));
+                                    tutorial.setUnitName("Unit: " + formatter.formatCellValue(currentCell));
                                     break;
 
                                 case 2:
-                                    System.out.println(formatter.formatCellValue(currentCell));
+//                                    System.out.println("order1: " + formatter.formatCellValue(currentCell));
                                     tutorial.setOrder1(parseString(currentCell));
                                     break;
 
                                 case 4:
-                                    System.out.println(formatter.formatCellValue(currentCell));
+//                                    System.out.println("delivery1: " + formatter.formatCellValue(currentCell));
                                     tutorial.setDelivery1(parseString(currentCell));
                                     break;
 
@@ -103,6 +102,7 @@ public class ExcelHelper {
 
             return tutorials;
         } catch (IOException | ParseException e) {
+            System.out.println("error file: " + fileName);
             throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
         }
     }
@@ -113,13 +113,19 @@ public class ExcelHelper {
     }
 
     private static Integer parseString(Cell cellValue){
+
         try{
             return (int) cellValue.getNumericCellValue();
         }catch (Exception ne){
             System.out.println("Skip number" +cellValue.getStringCellValue());
-            if ("" != cellValue.getStringCellValue())
-            return Integer.valueOf(cellValue.getStringCellValue().replaceAll("[^\\d]",""));
-            else{
+            if ("" != cellValue.getStringCellValue()) {
+                String parseVal = cellValue.getStringCellValue().replaceAll("[^\\d]", "");
+                if ("" != parseVal) {
+                    return Integer.valueOf(parseVal);
+                } else {
+                    return 0;
+                }
+            }else{
                 return 0;
             }
         }
