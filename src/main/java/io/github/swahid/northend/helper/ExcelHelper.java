@@ -115,7 +115,7 @@ public class ExcelHelper {
     private static Integer parseString(Cell cellValue){
         try{
             return (int) cellValue.getNumericCellValue();
-        }catch (NumberFormatException ne){
+        }catch (Exception ne){
             System.out.println("Skip number" +cellValue.getStringCellValue());
             if ("" != cellValue.getStringCellValue())
             return Integer.valueOf(cellValue.getStringCellValue().replaceAll("[^\\d]",""));
