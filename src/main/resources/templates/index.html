@@ -9,41 +9,39 @@
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 <!--	<script type="text/javascript" src="/dist/pivot.js"></script>-->
-	<script type="text/javascript" src="https://pivottable.js.org/dist/pivot.js"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+<!--	<script type="text/javascript" src="https://pivottable.js.org/dist/pivot.js"></script>-->
+<!--	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>-->
 
 <!--	<link rel="stylesheet" type="text/css" href="/dist/pivot.css">-->
-	<link rel="stylesheet" type="text/css" href="https://pivottable.js.org/dist/pivot.css">
+<!--	<link rel="stylesheet" type="text/css" href="https://pivottable.js.org/dist/pivot.css">-->
 
-	<link href="https://cdn.webdatarocks.com/latest/webdatarocks.min.css" rel="stylesheet"/>
-	<script src="https://cdn.webdatarocks.com/latest/webdatarocks.toolbar.min.js"></script>
-	<script src="https://cdn.webdatarocks.com/latest/webdatarocks.js"></script>
+<!--	<link href="https://cdn.webdatarocks.com/latest/webdatarocks.min.css" rel="stylesheet"/>-->
+<!--	<script src="https://cdn.webdatarocks.com/latest/webdatarocks.toolbar.min.js"></script>-->
+<!--	<script src="https://cdn.webdatarocks.com/latest/webdatarocks.js"></script>-->
+	<script src="https://cdn.flexmonster.com/flexmonster.js"></script>
 
 
 	<style>
-                .collapsible {
-                  background-color: #777777;
-                  color: white;
-                  cursor: pointer;
-                  padding: 18px;
-                  width: 100%;
-                  border: none;
-                  text-align: left;
-                  outline: none;
-                  font-size: 15px;
-                }
+		.fm-custom-cell {
+		  display: flex !important;
+		  align-items: center !important;
+		  font-size: 12px !important;
+		}
 
-                .active, .collapsible:hover {
-                  background-color: #555;
-                }
+		.fm-custom-cell .flag-icon {
+		  width: 21px !important;
+		  height: 16px !important;
+		  margin-left: 0 !important;
+		  margin-right: 2px !important;
+		}
 
-                .content {
-                  padding: 0 18px;
-                  display: none;
-                  overflow: hidden;
-                  background-color: #f1f1f1;
-                }
-                </style>
+		#fm-pivot-view .fm-grid-layout .fm-custom-cell.fm-expanded .fm-expanded-icon::before,
+		#fm-pivot-view .fm-grid-layout .fm-custom-cell.fm-collapsed .fm-collapsed-icon::before {
+		  top: -2px;
+		  height: 16px;
+		}
+
+	</style>
 </head>
 <body>
 
@@ -69,11 +67,11 @@
 			<h3>Format & Export Your Data Tutorial</h3>
 
 			<!--pivotal ui table start -->
-			<div id="wdr-component"></div>
+			<div id="pivot-container"></div>
 
 
 
-			</div>
+		</div>
 			<!--pivotal ui table end -->
 		</div>
 	</div>
@@ -81,49 +79,225 @@
 
 <!--pivotal script here-->
 <script>
-$(function(){
-		$.getJSON( "/api/excel/data", function( northData ) {
-			console.log("json data");
-			console.log(northData);
-			var pivot = new WebDataRocks({
-					container: "#wdr-component",
-					beforetoolbarcreated: customizeToolbar,
-					toolbar: true,
-					report: {
-						dataSource: {
-							data: northData
-						}
-					},
-					slice: {
-						rows: [{
-							uniqueName: "items"
-						}],
-						columns: [{
-								uniqueName: "fileName"
-							},{
-								uniqueName: "[measures]"
-							}
-						],
-						measures: [{
-							uniqueName: "order1",
-							aggregation: "sum"
-						},{
-							uniqueName: "delivery1",
-							aggregation: "sum"
-						}]
-					}
-			});
+	$(function(){
+		$.getJSON( "/api/excel/data", function( responseData ) {
+			console.log("response data");
+			console.log(responseData);
+			generatePivotal(responseData);
 		});
-
-		function customizeToolbar(toolbar) {
-			var tabs = toolbar.getTabs(); // get all tabs from the toolbar
-			toolbar.getTabs = function() {
-				delete tabs[0]; // delete the first tab
-				return tabs;
-			}
-		}
-
 	});
+
+	function generatePivotal(jsonData){
+		new Flexmonster({
+  container: "#pivot-container",
+  componentFolder: "https://cdn.flexmonster.com/",
+  width: "100%",
+  height: 550,
+        customizeCell: customizeCell,
+        shareReportConnection: {
+            url: "https://olap.flexmonster.com:9500"
+        },
+        beforetoolbarcreated: function (toolbar) {
+            toolbar.showShareReportTab = true;
+            toolbar.shareReportHandler = function () {
+                toolbar.pivot.shareReport({
+                    url: "https://olap.flexmonster.com:9500"
+                })
+            }
+        },
+        toolbar: true,
+        report: {
+            "dataSource": {
+                "type": "json",
+                "filename": "https://cdn.flexmonster.com/data/retail-data.json",
+                "mapping": {
+                    "Quantity": {
+                        "type": "number"
+                    },
+                    "Price": {
+                        "type": "number"
+                    },
+                    "Retail Category": {
+                        "type": "string"
+                    },
+                    "Sales": {
+                        "type": "number"
+                    },
+                    "Order Date": {
+                        "type": "year/quarter/month/day"
+                    },
+                    "Date": {
+                        "type": "date"
+                    },
+                    "Status": {
+                        "type": "string"
+                    },
+                    "Product Code": {
+                        "type": "string"
+                    },
+                    "Phone": {
+                        "type": "string"
+                    },
+                    "Country": {
+                        "type": "string",
+                        "folder": "Location"
+                    },
+                    "City": {
+                        "type": "string",
+                        "folder": "Location"
+                    },
+                    "CurrencyID": {
+                        "type": "property",
+                        "hierarchy": "Country"
+                    },
+                    "Contact Last Name": {
+                        "type": "string"
+                    },
+                    "Contact First Name": {
+                        "type": "string"
+                    },
+                    "Deal Size": {
+                        "type": "string"
+                    }
+                }
+            },
+            "slice": {
+                "rows": [
+                    {
+                        "uniqueName": "Country",
+                        "filter": {
+                            "members": [
+                                "country.[australia]",
+                                "country.[usa]",
+                                "country.[japan]"
+                            ]
+                        }
+                    },
+                    {
+                        "uniqueName": "Status",
+                    }
+                ],
+                "columns": [
+                    {
+                        "uniqueName": "Order Date"
+                    },
+                    {
+                        "uniqueName": "[Measures]"
+                    }
+                ],
+                "measures": [
+                    {
+                        "uniqueName": "Price",
+                        "aggregation": "sum",
+                        "format": "-13w0a1w1c23j00"
+                    }
+                ],
+                "sorting": {
+                    "column": {
+                        "type": "desc",
+                        "tuple": [],
+                        "measure": {
+                            "uniqueName": "Price",
+                            "aggregation": "sum"
+                        }
+                    }
+                },
+                "expands": {
+                    "rows": [
+                        {
+                            "tuple": [
+                                "country.[japan]"
+                            ]
+                        }
+                    ]
+                },
+                "drills": {
+                    "columns": [
+                        {
+                            "tuple": [
+                                "order date.[2019]"
+                            ]
+                        }
+                    ]
+                },
+                "flatSort": [
+                    {
+                        "uniqueName": "Price",
+                        "sort": "desc"
+                    }
+                ]
+            },
+
+            "conditions": [{
+                "formula": "#value > 35000",
+                "isTotal": true,
+                "measure": "Price",
+                "format": {
+                    "backgroundColor": "#00A45A",
+                    "color": "#FFFFFF",
+                    "fontFamily": "Arial",
+                    "fontSize": "12px"
+                }
+            },
+            {
+                "formula": "#value < 2000",
+                "isTotal": false,
+                "measure": "Price",
+                "format": {
+                    "backgroundColor": "#df3800",
+                    "color": "#FFFFFF",
+                    "fontFamily": "Arial",
+                    "fontSize": "12px"
+                }
+            }
+            ],
+            "formats": [{
+                "name": "-13w0a1w1c23j00",
+                "thousandsSeparator": " ",
+                "decimalSeparator": ".",
+                "decimalPlaces": 0,
+                "currencySymbol": "$",
+                "positiveCurrencyFormat": "$1",
+                "nullValue": "-",
+                "textAlign": "right",
+                "isPercent": false
+            }]
+        }
+    });
+
+    function customizeCell(cell, data) {
+        if (data.hierarchy) {
+            if (data.type == "header") {
+                if (data.hierarchy.caption == "Country") {
+                    if (data.member) {
+                        if (data.member.properties) {
+                            var name = data.member.properties.CurrencyID;
+                            cell.addClass('fm-custom-cell');
+                            if (data.expanded) {
+                                var flag = '<i class="fm-icon fm-expanded-icon" title="Click to collapse">' + "<" + "/i>" + '<img class="flag-icon" src="https://cdn.flexmonster.com/flags/' + name.toLowerCase() + '.svg">';
+                            } else {
+                                var flag = '<i class="fm-icon fm-collapsed-icon" title="Click to expand">' + "<" + "/i>" + '<img class="flag-icon" src="https://cdn.flexmonster.com/flags/' + name.toLowerCase() + '.svg">';
+                            }
+                            cell.text = '<div style="display:flex; align-items:center; font-size:12px; position:relative;">' + flag + '<span style="margin-left: 2px; line-height: 16px;">' + data.member.caption + "<" + "/span>" + "<" + "/div>";
+                        }
+                    }
+                }
+
+            }
+
+        }
+    }
+
+
+	}
+
+	function customizeToolbar(toolbar) {
+		var tabs = toolbar.getTabs(); // get all tabs from the toolbar
+		toolbar.getTabs = function() {
+			delete tabs[0]; // delete the first tab
+			return tabs;
+		}
+	}
 
 </script>
 

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>Excel Data Export</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<!--	<script type="text/javascript" src="/dist/pivot.js"></script>-->
+	<script type="text/javascript" src="https://pivottable.js.org/dist/pivot.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+
+<!--	<link rel="stylesheet" type="text/css" href="/dist/pivot.css">-->
+	<link rel="stylesheet" type="text/css" href="https://pivottable.js.org/dist/pivot.css">
+
+	<link href="https://cdn.webdatarocks.com/latest/webdatarocks.min.css" rel="stylesheet"/>
+	<script src="https://cdn.webdatarocks.com/latest/webdatarocks.toolbar.min.js"></script>
+	<script src="https://cdn.webdatarocks.com/latest/webdatarocks.js"></script>
+
+
+	<style>
+                .collapsible {
+                  background-color: #777777;
+                  color: white;
+                  cursor: pointer;
+                  padding: 18px;
+                  width: 100%;
+                  border: none;
+                  text-align: left;
+                  outline: none;
+                  font-size: 15px;
+                }
+
+                .active, .collapsible:hover {
+                  background-color: #555;
+                }
+
+                .content {
+                  padding: 0 18px;
+                  display: none;
+                  overflow: hidden;
+                  background-color: #f1f1f1;
+                }
+                </style>
+</head>
+<body>
+
+<div class="container-fluid p-5 bg-primary text-white text-center">
+	<div class="row">
+		<div class="col-md-8 mx-auto">
+			<h2>Upload Your Excel File</h2>
+			<p th:text="${successMessage}" th:if="${successMessage ne null}" class="alert alert-success"></p>
+			<p th:text="${errorMessage}" th:if="${errorMessage ne null}" class="alert alert-danger"></p>
+			<form method="post" th:action="@{/upload}" enctype="multipart/form-data">
+				<div class="form-group">
+					<input type="file" name="file" class="form-control-file">
+					<button type="submit" class="btn btn-sm btn-warning">Upload File</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="container mt-5">
+	<div class="row">
+		<div class="col-sm-12 mx-auto text-center">
+			<h3>Format & Export Your Data Tutorial</h3>
+
+			<!--pivotal ui table start -->
+			<div id="wdr-component"></div>
+
+
+
+			</div>
+			<!--pivotal ui table end -->
+		</div>
+	</div>
+</div>
+
+<!--pivotal script here-->
+<script>
+$(function(){
+		$.getJSON( "/api/excel/data", function( northData ) {
+			console.log("json data");
+			console.log(northData);
+			var pivot = new WebDataRocks({
+					container: "#wdr-component",
+					beforetoolbarcreated: customizeToolbar,
+					toolbar: true,
+					report: {
+						dataSource: {
+							data: northData
+						}
+					},
+					slice: {
+						rows: [{
+							uniqueName: "items"
+						}],
+						columns: [{
+								uniqueName: "fileName"
+							},{
+								uniqueName: "[measures]"
+							}
+						],
+						measures: [{
+							uniqueName: "order1",
+							aggregation: "sum"
+						},{
+							uniqueName: "delivery1",
+							aggregation: "sum"
+						}]
+					}
+			});
+		});
+
+		function customizeToolbar(toolbar) {
+			var tabs = toolbar.getTabs(); // get all tabs from the toolbar
+			toolbar.getTabs = function() {
+				delete tabs[0]; // delete the first tab
+				return tabs;
+			}
+		}
+
+	});
+
+</script>
+
+
+</body>
+</html>

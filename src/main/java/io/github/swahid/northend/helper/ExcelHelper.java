@@ -1,12 +1,8 @@
 package io.github.swahid.northend.helper;
 
 import io.github.swahid.northend.entity.NorthEnd;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +30,8 @@ public class ExcelHelper {
         try {
             Workbook workbook = new XSSFWorkbook(is);
             List<NorthEnd> tutorials = new ArrayList<>();
-            fileName = fileName.substring(0, fileName.lastIndexOf("."));
+            //fileName = fileName.substring(0, fileName.lastIndexOf("."));
+            DataFormatter formatter = new DataFormatter();
 
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 if( i >6) break;
@@ -75,13 +72,13 @@ public class ExcelHelper {
                                     break;
 
                                 case 2:
-                                    System.out.println(currentCell.getNumericCellValue());
-                                    tutorial.setOrder1((int) currentCell.getNumericCellValue());
+                                    System.out.println(formatter.formatCellValue(currentCell));
+                                    tutorial.setOrder1(parseString(currentCell));
                                     break;
 
                                 case 4:
                                     System.out.println(currentCell.getNumericCellValue());
-                                    tutorial.setDelivery1((int) currentCell.getNumericCellValue());
+                                    tutorial.setDelivery1(parseString(currentCell));
                                     break;
 
                                 default:
@@ -92,7 +89,7 @@ public class ExcelHelper {
                         }
 
                         tutorial.setDailyDate(ExcelHelper.convertDate(fileName));
-                        tutorial.setFileName(fileName);
+                        tutorial.setFileName(new SimpleDateFormat("yyyy-MM-dd EEE").format(tutorial.getDailyDate()));
                         tutorial.setSheetName(sheet.getSheetName());
                         tutorials.add(tutorial);
                     }
@@ -111,7 +108,22 @@ public class ExcelHelper {
     }
 
     private static Date convertDate(String fileName) throws ParseException {
-        System.out.println(fileName);
+        //System.out.println(fileName);
         return new SimpleDateFormat("dd.MM.yyyy").parse(fileName.substring(0,10));
     }
+
+    private static Integer parseString(Cell cellValue){
+        try{
+            return (int) cellValue.getNumericCellValue();
+        }catch (NumberFormatException ne){
+            System.out.println("Skip number" +cellValue.getStringCellValue());
+            if ("" != cellValue.getStringCellValue())
+            return Integer.valueOf(cellValue.getStringCellValue().replaceAll("[^\\d]",""));
+            else{
+                return 0;
+            }
+        }
+
+    }
+
 }
