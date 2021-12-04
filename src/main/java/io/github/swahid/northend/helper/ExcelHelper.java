@@ -77,7 +77,7 @@ public class ExcelHelper {
                                     break;
 
                                 case 4:
-                                    System.out.println(currentCell.getNumericCellValue());
+                                    System.out.println(formatter.formatCellValue(currentCell));
                                     tutorial.setDelivery1(parseString(currentCell));
                                     break;
 
