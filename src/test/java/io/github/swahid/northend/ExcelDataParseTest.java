@@ -22,7 +22,7 @@ public class ExcelDataParseTest {
     @Test
     public void parseData() throws FileNotFoundException {
 
-        String filePath = "/Users/swahid/workspaces/self/shormin/document/northend/Delivery-Apolo/data";
+        String filePath = "/Users/swahid/workspaces/self/shormin/document/northend/Delivery-ukhia/data";
         System.out.println("filePath: " + filePath);
 
         File folder = new File(filePath);
